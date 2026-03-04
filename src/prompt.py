@@ -32,7 +32,7 @@ Context:
     
     return template
 
-def build_prompt(query, docs):
+def build_prompt(query, docs, chat_history=[]):
     """
     Build a simple prompt from query and retrieved documents.
     For non-chain usage.
@@ -40,11 +40,24 @@ def build_prompt(query, docs):
     Args:
         query: User question
         docs: Retrieved documents
+        chat_history: Previous conversation messages (optional)
         
     Returns:
         Formatted prompt string
     """
+    from langchain_core.messages import HumanMessage, AIMessage
+    
     context = "\n\n".join([doc.page_content for doc in docs])
+    
+    # Format chat history if present
+    history_text = ""
+    if chat_history:
+        history_text = "\n\nPrevious conversation:\n"
+        for msg in chat_history[-4:]:  # Last 2 exchanges
+            if isinstance(msg, HumanMessage):
+                history_text += f"User: {msg.content}\n"
+            elif isinstance(msg, AIMessage):
+                history_text += f"Assistant: {msg.content}\n"
     
     prompt = f"""You are a medical assistant specializing in gut health.
 
@@ -64,6 +77,7 @@ ANSWER QUALITY RULES:
 
 Context:
 {context}
+{history_text}
 
 Question: {query}
 
