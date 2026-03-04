@@ -33,7 +33,7 @@ I also used several other techniques:
 **Trust score**: I calculate a confidence measure based on retrieval quality (how well the chunks match the query). Low trust scores indicate weak retrieval, which can signal potential hallucination risk.
 
 
-When tested with queries about topics not covered in the documents, the system correctly responds with "I don't know" instead of generating answers from the LLM's training data.
+When tested with out-of-scope queries (e.g., "What is gradient descent?"), the system correctly responds "I don't know based on the provided context" even though the LLM knows about gradient descent from its training data. The trust score also correctly flags low confidence (0.377), indicating weak retrieval match.
 
 These multiple layers work together to keep the system grounded in the actual document content.
 
