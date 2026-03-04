@@ -201,8 +201,9 @@ Try these questions:
    - "What factors affect gut microbiome composition?"
 
 4. **Out-of-Scope** (Tests grounding)
-   - "Does gut microbiome affect Alzheimer's disease?"
+   - "What is gradient descent?"
    - Expected: "I don't know based on the provided context."
+   - Result: System correctly refuses to answer + Low trust score (0.377)
 
 ## 🎓 Key Design Decisions
 
