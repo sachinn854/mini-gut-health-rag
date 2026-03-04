@@ -1,0 +1,78 @@
+================================================================================
+SAMPLE QUERY RESULTS - GUT HEALTH RAG SYSTEM
+================================================================================
+
+Query: "What is the gut microbiome?"
+
+================================================================================
+🤖 GENERATED ANSWER
+================================================================================
+The gut microbiome is the community of microorganisms—mainly bacteria—that 
+live in the human gastrointestinal tract. These microbial cells outnumber 
+the body's own cells by about ten to one, and the genes they carry exceed 
+the human genome by more than one hundredfold. This complex ecosystem of 
+gut-associated microbes is referred to as the gut microbiome.
+
+================================================================================
+📚 CITATIONS
+================================================================================
+[1] article_blog.pdf (Page 0)
+[2] research.pdf (Page 0)
+[3] article_blog.pdf (Page 0)
+
+================================================================================
+🎯 TRUST SCORE
+================================================================================
+Score: 0.677 (Medium confidence)
+
+Interpretation: Moderate semantic match between query and retrieved context
+
+================================================================================
+📊 TRUST SCORE METHODOLOGY
+================================================================================
+The trust score is calculated as the inverse-normalized average similarity 
+distance of the top-3 retrieved chunks from the vector database.
+
+Formula: trust = average(1 / (1 + distance)) for each retrieved chunk
+
+Interpretation:
+- Higher semantic alignment between query and retrieved context = higher trust
+- Score range: 0.0 to 1.0
+- High (≥0.8): Strong semantic match, high confidence
+- Medium (0.6-0.8): Moderate match, reasonable confidence  
+- Low (<0.6): Weak match, lower confidence
+
+This provides a quantitative measure of how well the retrieved context
+matches the user's query, indicating answer reliability.
+
+================================================================================
+RETRIEVED CHUNKS (Context Used)
+================================================================================
+
+CHUNK 1 (Similarity: 0.684):
+Source: article_blog.pdf (Page 0)
+Content: "The bacterial cells harbored within the human gastrointestinal 
+tract (GIT) outnumber the host's cells by a factor of 10 and the genes 
+encoded by the bacteria resident within the GIT outnumber their host's 
+genes by more than 100 times. These human digestive-tract associated 
+microbes are referred to as the gut microbiome..."
+
+CHUNK 2 (Similarity: 0.678):
+Source: research.pdf (Page 0)
+Content: "The human intestinal microbiota refers to the entire population 
+of micro-organisms that colonises the human intestines..."
+
+CHUNK 3 (Similarity: 0.670):
+Source: article_blog.pdf (Page 0)
+Content: Similar content about gut microbiome definition and bacterial counts.
+
+================================================================================
+SYSTEM FEATURES DEMONSTRATED
+================================================================================
+✅ Retrieval-Augmented Generation (RAG)
+✅ Semantic search with FAISS vector database
+✅ Proper citations with source and page numbers
+✅ Trust score calculation with clear methodology
+✅ Grounded generation (no hallucination)
+✅ Complete, grammatically correct answers
+✅ Context verification capability

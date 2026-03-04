@@ -81,6 +81,16 @@ Place your PDF documents in the `data/` folder:
 
 ## 📊 Usage
 
+**Important**: Make sure your virtual environment is activated before running any commands:
+
+```bash
+# Windows
+venv\Scripts\activate
+
+# Linux/Mac
+source venv/bin/activate
+```
+
 ### Step 1: Ingest Documents
 
 Run the ingestion pipeline to process PDFs and create the vector database:
