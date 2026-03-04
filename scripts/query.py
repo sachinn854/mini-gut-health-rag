@@ -18,13 +18,14 @@ chat_history = []
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 VECTOR_STORE_PATH = os.path.join(BASE_DIR, "data", "vector_store")
 
-def query_rag_system(query, show_chunks=False):
+def query_rag_system(query, show_chunks=False, chat_history=[]):
     """
     Query the RAG system and return answer with sources and trust score.
     
     Args:
         query: User question
         show_chunks: Whether to display retrieved chunks
+        chat_history: Previous conversation messages (optional)
         
     Returns:
         tuple: (answer, docs, scores, trust_score)
@@ -57,7 +58,7 @@ def query_rag_system(query, show_chunks=False):
     
     # Build prompt with context
     print("\n🧠 Generating answer...")
-    prompt = build_prompt(query, docs)
+    prompt = build_prompt(query, docs, chat_history)
     
     # Generate answer
     answer = generate_answer(prompt)
@@ -113,7 +114,7 @@ def main():
         
         try:
             # Query the system
-            answer, docs, scores, trust_score = query_rag_system(query, show_chunks)
+            answer, docs, scores, trust_score = query_rag_system(query, show_chunks, chat_history)
             
             # Store in memory
             chat_history.append(HumanMessage(content=query))
