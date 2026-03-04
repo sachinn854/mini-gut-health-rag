@@ -16,7 +16,9 @@ A Retrieval-Augmented Generation (RAG) system for gut health and microbiome info
 ```
 mini-gut-health-rag/
 ├── data/
-│   ├── raw/                    # Original PDF documents
+│   ├── article_blog.pdf
+|   ├── research.pdf
+|   ├── youtube_transcript.pdf                  
 │   └── vector_store/           # FAISS index files
 ├── src/
 │   ├── loader.py              # PDF loading with PyMuPDF
