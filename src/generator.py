@@ -21,7 +21,7 @@ def get_llm():
         api_key=os.getenv("GROQ_API_KEY"),
         base_url="https://api.groq.com/openai/v1",
         model="llama-3.1-8b-instant",
-        temperature=0.15,  # Deterministic responses, no creativity
+        temperature=0.1,  # Deterministic responses, no creativity
     )
     return model
 

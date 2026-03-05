@@ -8,9 +8,24 @@ This document explains the key design choices I made for the Gut Health RAG syst
 
 I used a chunk size of 800 characters with 150-character overlap.
 
-This size keeps enough context together so that concepts like diseases, mechanisms, or bacterial names are not split awkwardly across chunks. Very small chunks (< 500 chars) hurt retrieval because semantic meaning gets fragmented - you might get half a sentence about probiotics in one chunk and the rest in another. Very large chunks (> 1500 chars) reduce precision because unrelated topics get embedded together, making it harder to pinpoint the exact relevant information.
+This size keeps enough context together so that concepts like diseases, mechanisms, or bacterial names are not split awkwardly across chunks. 
 
-I tested 500, 800, 1000, and 1500 character chunks on the actual documents. The 800-character size gave the most coherent chunks while maintaining good retrieval precision.
+**Why not smaller (300-400 chars)?**
+
+While smaller chunks can make retrieval more precise, they create a bigger problem: context fragmentation. In medical/scientific content, explanations often span multiple sentences. For example:
+
+- Paragraph 1: "Gut microbiota imbalance can affect immune function..."
+- Paragraph 2: "This imbalance has been linked with IBD and IBS..."
+
+If I use 300-char chunks, these get split. When a user asks "What diseases are linked to gut microbiota?", the retriever might fetch the first paragraph but miss the second one with the actual disease names. The answer becomes incomplete.
+
+**Why not larger (1500+ chars)?**
+
+Very large chunks reduce precision because unrelated topics get embedded together, making it harder to pinpoint the exact relevant information. The embedding becomes diluted with noise.
+
+**Why 800 works:**
+
+I tested 500, 800, 1000, and 1500 character chunks on the actual documents. The 800-character size gave the most coherent chunks while maintaining good retrieval precision. It captures 2-3 complete paragraphs - enough context to preserve meaning without adding noise.
 
 The 150-character overlap (~18%) ensures that if a key sentence falls near a chunk boundary, it appears complete in at least one chunk. This prevents information loss at split points.
 
@@ -20,22 +35,35 @@ I used RecursiveCharacterTextSplitter because it splits on natural boundaries (p
 
 ## 2. Reducing Hallucinations
 
-The system uses a retrieval-first architecture (RAG). The LLM only receives the top-3 most relevant chunks before generating an answer - it never sees the query in isolation.
+I designed the system using a **retrieval-first architecture (RAG)**. The LLM never answers the query in isolation; it only receives the **top-3 most relevant chunks retrieved from the vector database** before generating a response. This keeps the model grounded in the actual document content.
 
-I also used several other techniques:
+I used several additional techniques to reduce hallucinations:
 
-**Strict prompt engineering**: The prompt explicitly instructs the model to answer ONLY from the provided context and to respond "I don't know based on the provided context" if the information is not present.
+**Strict prompt instructions**
 
-**Temperature = 0**: This makes responses deterministic and focused on extracting information rather than generating creative content.
+I explicitly instruct the model to answer **only from the provided context**. If the information is not present in the retrieved chunks, the model is instructed to respond with:
 
-**Citation tracking**: Every answer includes source documents with page numbers, making it easy to verify grounding.
+*"I don't know based on the provided context."*
 
-**Trust score**: I calculate a confidence measure based on retrieval quality (how well the chunks match the query). Low trust scores indicate weak retrieval, which can signal potential hallucination risk.
+**Low temperature (0)**
 
+I set the generation temperature close to **0** so the model focuses on extracting information from the retrieved context instead of producing creative or speculative responses.
 
-When tested with out-of-scope queries (e.g., "What is gradient descent?"), the system correctly responds "I don't know based on the provided context" even though the LLM knows about gradient descent from its training data. The trust score also correctly flags low confidence (0.377), indicating weak retrieval match.
+**Source citations**
 
-These multiple layers work together to keep the system grounded in the actual document content.
+Each generated answer includes **citations with document names and page numbers**. This makes the responses transparent and allows the user to verify the grounding.
+
+**Trust score for retrieval quality**
+
+I implemented a **trust score** based on the similarity distance between the query and the retrieved chunks. Lower similarity leads to a lower trust score, indicating weaker retrieval support for the answer.
+
+To verify that the system stays grounded, I tested it with **out-of-scope queries** (for example: *"What is gradient descent?"*). Since this concept does not appear in the documents, the system correctly responded with:
+
+*"I don't know based on the provided context."*
+
+In those cases, the trust score also dropped significantly (around **0.37**), which correctly indicated weak retrieval alignment.
+
+Overall, these mechanisms help ensure that the model relies on **retrieved document evidence rather than its pre-trained knowledge**, which significantly reduces hallucination risk.
 
 ---
 
@@ -52,7 +80,7 @@ For production systems handling 500,000+ documents, I would switch to a managed 
 - Built-in metadata filtering
 - Real-time updates without downtime
 
-But for this project, FAISS is the right choice - it's fast enough and keeps the architecture simple.
+For this prototype-scale dataset, FAISS is the most practical choice - it's fast enough and keeps the architecture simple.
 
 ---
 
@@ -135,4 +163,4 @@ This system demonstrates production-ready thinking:
 - **Temporal awareness**: Version control and soft deletes for evolving research
 - **Practical trade-offs**: Simple semantic search for prototype, hybrid search for production
 
-The prototype is intentionally simple, but the architecture is designed with scale and reliability in mind.
+The current implementation focuses on a simple and reliable prototype, while the architecture keeps a clear path toward production scalability.
