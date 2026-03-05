@@ -41,7 +41,7 @@ mini-gut-health-rag/
 └── .env                       # API keys (not in repo)
 ```
 
-## � How It Wsorks
+## � How It Works
 
 ### Ingestion Pipeline (One-time setup)
 ```
