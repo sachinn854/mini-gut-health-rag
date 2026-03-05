@@ -41,6 +41,51 @@ mini-gut-health-rag/
 └── .env                       # API keys (not in repo)
 ```
 
+## � How It Wsorks
+
+### Ingestion Pipeline (One-time setup)
+```
+PDFs (data/) 
+    ↓ [loader.py] - Load PDFs with multi-column support
+Documents (79 pages)
+    ↓ [chunking.py] - Split into 800-char chunks with 150 overlap
+Chunks (281 pieces)
+    ↓ [embeddings.py] - Generate 384-dim vectors
+Embeddings
+    ↓ [vectorstore.py] - Create FAISS index
+Vector Database (data/vector_store/)
+```
+
+### Query Pipeline (Every question)
+```
+User Query
+    ↓ [embeddings.py] - Convert query to vector
+Query Vector
+    ↓ [retriever.py] - Search FAISS for top-3 similar chunks
+Retrieved Chunks + Scores
+    ↓ [trust_score.py] - Calculate confidence (0-1)
+    ↓ [prompt.py] - Build prompt with context + chat history
+Prompt
+    ↓ [generator.py] - Generate answer using Groq LLM
+Answer + Citations + Trust Score
+```
+
+### File Responsibilities
+
+| File | Purpose | When Used |
+|------|---------|-----------|
+| `loader.py` | Load PDFs, handle multi-column layouts | Ingestion |
+| `chunking.py` | Split text into semantic chunks | Ingestion |
+| `embeddings.py` | Generate vector embeddings | Ingestion + Query |
+| `vectorstore.py` | Create/load FAISS database | Ingestion + Query |
+| `retriever.py` | Search for relevant chunks | Query |
+| `prompt.py` | Build LLM prompt with context | Query |
+| `generator.py` | Generate answer using Groq | Query |
+| `trust_score.py` | Calculate confidence score | Query |
+| `ingest.py` | Orchestrate ingestion pipeline | Setup |
+| `query.py` | Interactive chat interface | Usage |
+| `test_generation.py` | Test and verify system | Testing |
+
 ## 🚀 Setup Instructions
 
 ### 1. Clone Repository
