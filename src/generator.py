@@ -1,9 +1,5 @@
 from dotenv import load_dotenv
-from langchain_core.prompts import PromptTemplate
-from langchain_core.output_parsers import StrOutputParser
 from langchain_openai import ChatOpenAI
-from langchain_core.runnables import RunnablePassthrough
-from src.prompt import get_rag_prompt
 import os
 
 load_dotenv()
@@ -39,34 +35,3 @@ def generate_answer(prompt_text):
     llm = get_llm()
     response = llm.invoke(prompt_text)
     return response.content
-
-def create_rag_chain(retriever):
-    """
-    Create RAG chain with retriever, prompt, and LLM.
-    Uses LangChain runnables for chaining.
-    
-    Args:
-        retriever: Document retriever instance
-        
-    Returns:
-        Runnable RAG chain
-    """
-    llm = get_llm()
-    prompt = get_rag_prompt()
-    
-    def format_docs(docs):
-        return "\n\n".join([doc.page_content for doc in docs])
-    
-    # Create RAG chain using runnables
-    rag_chain = (
-        {
-            "context": retriever | format_docs,
-            "question": RunnablePassthrough(),
-            "chat_history": lambda x: []  # Empty for now, will add memory later
-        }
-        | prompt
-        | llm
-        | StrOutputParser()
-    )
-    
-    return rag_chain
